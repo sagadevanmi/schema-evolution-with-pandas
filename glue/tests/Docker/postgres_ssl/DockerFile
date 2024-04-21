@@ -1,0 +1,12 @@
+FROM postgres
+
+WORKDIR /var/lib/postgresql
+
+RUN openssl req -new -x509 -days 365 -nodes -text -out server.crt \
+	-keyout server.key -subj "/CN=localhost" && \
+	chmod og-rwx server.key && \
+	chown postgres server.key
+
+COPY postgresql.conf postgresql.conf
+
+CMD ["-c", "config_file=/var/lib/postgresql/postgresql.conf"]

@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  glue:
+    container_name: glue_pytest
+    build:
+      context: ./Docker/glue
+      dockerfile: ./DockerFile
+    entrypoint: /home/glue_user/jupyter/jupyter_start.sh
+    environment:
+      - DISABLE_SSL=true
+    privileged: true
+    ports:
+      - '4069:4069'
+      - '18080:18080'
+      - '8998:8998'
+      - '8888:8888'
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - C:\Users\sagad\Desktop\SchemaEvolution\:/home/glue_user/workspace/jupyter_workspace/
+  se_postgres:
+    container_name: se_postgres
+    build:
+      context: ./Docker/postgres_ssl
+      dockerfile: ./DockerFile
+    ports:
+      - "5432:5432"
+    depends_on:
+      - glue
+    environment:
+      - POSTGRES_PASSWORD=pwd123
+      - POSTGRES_DB=dwh
+      - ACCEPT_EULA=1
