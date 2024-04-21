@@ -17,7 +17,7 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - C:\Users\sagad\Desktop\SchemaEvolution\:/home/glue_user/workspace/jupyter_workspace/
+      - C:\Users\sagad\Desktop\SchemaEvolution\schema-evolution-with-pandas\:/home/glue_user/workspace/jupyter_workspace/
   se_postgres:
     container_name: se_postgres
     build:
