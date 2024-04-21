@@ -273,7 +273,7 @@ class SchemaEvolution:
         dataframe: pd.DataFrame,
         table_name: str,
         postgres_schema: str = "stg",
-    ) -> bool:
+    ) -> (bool, dict):
         """Check if the schema of a dataframe is compatible with a Postgres table.
 
         Args:
@@ -315,7 +315,7 @@ class SchemaEvolution:
             if file_schema.get(f"{table_col}") in pandas_compatible_datatypes[f"{corresponding_dtype}"]:
                 if "char" not in table_col_dtype:
                     continue
-                incoming_length = dataframe[f"{table_col}"].str.len().max()
+                incoming_length = dataframe[f"{table_col}"].astype("str").str.len().max()
                 if table_col_length >= incoming_length:
                     continue
                 else:
@@ -341,7 +341,7 @@ class SchemaEvolution:
 
         return compatablity_status, incompatible_dict
 
-    def perform_schema_evolution(self, transformed_df: pd.DataFrame, table_name: str, postgres_schema: str = "stg"):
+    def perform_schema_evolution(self, transformed_df: pd.DataFrame, table_name: str, postgres_schema: str = "stg") -> (pd.DataFrame, str):
         """Perform schema evolution on a dataframe.
 
         Args:
@@ -351,6 +351,7 @@ class SchemaEvolution:
 
         Returns:
             pd.DataFrame: The evolved dataframe.
+            exc: Any Exception which occurred during schema evolution
         """
         # schema evolution
         (
@@ -367,7 +368,7 @@ class SchemaEvolution:
         evolved_df, evol_exc = self.update_table_schema(table_name, transformed_df, postgres_schema)
         return evolved_df, evol_exc
 
-    def process(self, filename="employee.csv"):
+    def process(self, filename="employee.csv") -> None:
         """Process a file and perform schema evolution.
 
         Args:

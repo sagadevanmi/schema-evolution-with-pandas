@@ -1,4 +1,5 @@
 import pytest
+from typing import Any, Dict
 import pg8000 as pg
 from botocore.exceptions import ClientError
 from scripts.utils.log_support import set_logger
@@ -9,8 +10,17 @@ log = set_logger()
 
 @pytest.mark.usefixtures("setup_database", "s3_client")
 class TestSchemaEvolution:
+    """
+    Class to test schema evolution process.
+    """
 
-    def create_conn(self):
+    def create_conn(self) -> Any:
+        """
+        Creates a connection to the PostgreSQL database.
+
+        Returns:
+            pg8000.dbapi.Connection: Connection object.
+        """
         con = None
         con = pg.connect(
             database="dwh",
@@ -24,7 +34,13 @@ class TestSchemaEvolution:
         return con
 
 
-    def setup_mocked_infra(self, s3_client):
+    def setup_mocked_infra(self, s3_client: Any) -> None:
+        """
+        Sets up mocked infrastructure by uploading raw files to S3.
+
+        Args:
+            s3_client (Any): S3 client object.
+        """
         bucket_config = "dev-s3-bucket"
         log.info("Uploading raw files in E2E tests")
 
@@ -77,7 +93,13 @@ class TestSchemaEvolution:
                 log.error("config_path already exists")
             log.error(client_error)
 
-    def test_initial_load(self, s3_client):
+    def test_initial_load(self, s3_client: Any) -> None:
+        """
+        Test initial data load.
+
+        Args:
+            s3_client (Any): S3 client object.
+        """
         self.setup_mocked_infra(s3_client)
         log.info("Starting test execution")
         schema_evol_obj = SchemaEvolution()
@@ -90,7 +112,13 @@ class TestSchemaEvolution:
         row_count = cursor.execute(query).fetchall()[0][0]
         assert row_count == 3
     
-    def test_column_addition(self, s3_client):
+    def test_column_addition(self, s3_client: Any) -> None:
+        """
+        Test addition of columns.
+
+        Args:
+            s3_client (Any): S3 client object.
+        """
         self.setup_mocked_infra(s3_client)
         log.info("Starting test execution")
         schema_evol_obj = SchemaEvolution()
@@ -106,7 +134,13 @@ class TestSchemaEvolution:
         assert "experience" in schema_dict.keys()
         assert row_count == 7
     
-    def test_column_removal(self, s3_client):
+    def test_column_removal(self, s3_client: Any) -> None:
+        """
+        Test removal of columns.
+
+        Args:
+            s3_client (Any): S3 client object.
+        """
         self.setup_mocked_infra(s3_client)
         log.info("Starting test execution")
         schema_evol_obj = SchemaEvolution()
@@ -122,7 +156,13 @@ class TestSchemaEvolution:
         assert "last_name" in schema_dict.keys() # column won't be dropped from table
         assert row_count == 11
     
-    def test_incompatible_change(self, s3_client):
+    def test_incompatible_change(self, s3_client: Any) -> None:
+        """
+        Test incompatible schema changes.
+
+        Args:
+            s3_client (Any): S3 client object.
+        """
         self.setup_mocked_infra(s3_client)
         log.info("Starting test execution")
         schema_evol_obj = SchemaEvolution()
@@ -137,7 +177,13 @@ class TestSchemaEvolution:
         row_count = cursor.execute(query).fetchall()[0][0]
         assert row_count == 11
     
-    def test_datatype_narrowing(self, s3_client):
+    def test_datatype_narrowing(self, s3_client: Any) -> None:
+        """
+        Test narrowing of data types.
+
+        Args:
+            s3_client (Any): S3 client object.
+        """
         self.setup_mocked_infra(s3_client)
         log.info("Starting test execution")
         schema_evol_obj = SchemaEvolution()
@@ -148,9 +194,15 @@ class TestSchemaEvolution:
         cursor = conn.cursor()
         query = "SELECT COUNT(*) FROM stg.employee;"
         row_count = cursor.execute(query).fetchall()[0][0]
-        assert row_count == 11
+        assert row_count == 14
     
-    def test_datatype_widening(self, s3_client):
+    def test_datatype_widening(self, s3_client: Any) -> None:
+        """
+        Test widening of data types.
+
+        Args:
+            s3_client (Any): S3 client object.
+        """
         self.setup_mocked_infra(s3_client)
         log.info("Starting test execution")
         schema_evol_obj = SchemaEvolution()
@@ -163,4 +215,4 @@ class TestSchemaEvolution:
         cursor = conn.cursor()
         query = "SELECT COUNT(*) FROM stg.employee;"
         row_count = cursor.execute(query).fetchall()[0][0]
-        assert row_count == 11
+        assert row_count == 14
