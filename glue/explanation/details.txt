@@ -1,0 +1,81 @@
+ **Purpose:**
+The purpose of this code is to perform schema evolution on a dataframe before loading it into a Postgres table. Schema evolution involves checking the compatibility of the dataframe's schema with the existing table schema and making necessary adjustments to ensure a smooth data load.
+
+**Functionality:**
+The code starts by creating an instance of the `SchemaEvolution` class, which contains methods for connecting to Postgres, retrieving table schemas, updating table schemas, and loading data into Postgres.
+
+The `get_table_schema` method retrieves the schema of a table in Postgres, including column names, data types, nullability, and character maximum length.
+
+The `abbreviate_column_name` method abbreviates column names that exceed 62 characters to ensure compatibility with Postgres naming conventions.
+
+The `rename_new_columns` method renames new columns in the dataframe to ensure they meet the 62-character limit.
+
+The `update_table_schema` method compares the dataframe schema with the existing table schema and makes necessary changes to the table schema, such as adding new columns or altering data types.
+
+The `create_sqlalchemy_engine` method creates a SQLAlchemy engine for connecting to Postgres.
+
+The `load_to_postgres` method loads the dataframe into a Postgres table.
+
+The `check_float_columns` method checks if float columns in the dataframe are actually integers and makes appropriate adjustments to the data types.
+
+The `check_schema_compatability` method checks if the dataframe schema is compatible with the Postgres table schema and identifies any incompatibilities.
+
+The `perform_schema_evolution` method performs schema evolution on the dataframe, including updating the table schema and loading the data into Postgres.
+
+**Input:**
+The input to the code is a dataframe that needs to be loaded into a Postgres table. The dataframe is expected to have a schema that is compatible with the existing table schema or can be evolved to be compatible.
+
+**Output:**
+The output of the code is a dataframe that has been evolved to match the Postgres table schema and has been loaded into the table. Any incompatibilities between the dataframe schema and the table schema are reported.
+
+**Key Components:**
+
+- `SchemaEvolution` class: This class contains methods for connecting to Postgres, retrieving table schemas, updating table schemas, and loading data into Postgres.
+- `get_table_schema` method: This method retrieves the schema of a table in Postgres.
+- `abbreviate_column_name` method: This method abbreviates column names that exceed 62 characters.
+- `rename_new_columns` method: This method renames new columns in the dataframe to ensure they meet the 62-character limit.
+- `update_table_schema` method: This method compares the dataframe schema with the existing table schema and makes necessary changes to the table schema.
+- `create_sqlalchemy_engine` method: This method creates a SQLAlchemy engine for connecting to Postgres.
+- `load_to_postgres` method: This method loads the dataframe into a Postgres table.
+- `check_float_columns` method: This method checks if float columns in the dataframe are actually integers and makes appropriate adjustments to the data types.
+- `check_schema_compatability` method: This method checks if the dataframe schema is compatible with the Postgres table schema and identifies any incompatibilities.
+- `perform_schema_evolution` method: This method performs schema evolution on the dataframe, including updating the table schema and loading the data into Postgres.
+
+**Algorithm/Logic:**
+
+1. Create an instance of the `SchemaEvolution` class.
+2. Retrieve the schema of the target Postgres table using the `get_table_schema` method.
+3. Compare the dataframe schema with the table schema using the `check_schema_compatability` method.
+4. If the schemas are compatible, load the dataframe into the table using the `load_to_postgres` method.
+5. If the schemas are not compatible, perform schema evolution on the dataframe using the `perform_schema_evolution` method. This may involve updating the table schema and/or making adjustments to the dataframe.
+6. Load the evolved dataframe into the table using the `load_to_postgres` method.
+
+**Dependencies:**
+
+- `pandas` library for data manipulation and analysis.
+- `pg8000` library for connecting to Postgres.
+- `sqlalchemy` library for interacting with relational databases.
+
+**Configuration:**
+
+The code requires the following configuration settings:
+
+- `database`: The name of the Postgres database to connect to.
+- `username`: The username to connect to Postgres with.
+- `password`: The password to connect to Postgres with.
+- `hostname`: The hostname or IP address of the Postgres server.
+- `port`: The port number of the Postgres server.
+
+**Error Handling:**
+
+The code handles errors by catching exceptions and logging them using the `logger` object. Specific error messages are provided for different types of errors, such as database connection errors, schema incompatibility errors, and data loading errors.
+
+**Usage:**
+
+To use the code, create an instance of the `SchemaEvolution` class and call the `process` method, passing in the filename of the CSV file to be processed. The code will automatically connect to Postgres, perform schema evolution if necessary, and load the data into the specified table.
+
+**Notes:**
+
+- The code assumes that the Postgres table already exists and has a schema that can be evolved.
+- The code does not handle complex data types such as arrays or JSON.
+- The code does not handle foreign key constraints or other database-specific features.

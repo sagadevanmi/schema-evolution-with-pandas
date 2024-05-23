@@ -1,0 +1,14 @@
+__main__
+    -> process()
+        -> read csv
+        -> perform_schema_evolution()
+            -> check_schema_compatability()
+                -> get_table_schema()
+                if incompatibilities found:
+                    -> check_float_columns()
+            -> if compatible:
+                -> update_table_schema()
+                    -> get_table_schema()
+                    -> rename_new_columns()
+                        -> abbreviate_column_name()
+            
