@@ -235,7 +235,7 @@ class SchemaEvolution:
         return count, stg_exc
 
     def check_float_columns(self, dataframe: pd.DataFrame, incompatible_dict: dict) -> dict:
-        """Check if float columns are actually integers.
+        """Check if float columns are actually integers. Because Pandas might have considered some int columns as float
 
         Args:
             dataframe (pd.DataFrame): The dataframe to check.
@@ -302,6 +302,7 @@ class SchemaEvolution:
                 # check nullabality
                 compatablity_status = False
                 if table_col_dtype == "character varying" and table_col_nullability == "NO":
+                    # not nullable, hence adding to incompatible list
                     logger.info(f"{table_col} is_nullable: {table_col_nullability}")
                     incompatible_dict[f"{table_col}"] = {
                         "table_col_dtype": table_col_dtype,
@@ -376,11 +377,14 @@ class SchemaEvolution:
         """
         bucket_name = "dev-s3-bucket"
         table_name = "employee"
-        dataframe = pd.read_csv(f"s3://{bucket_name}/raw/employee/{filename}")
+        dataframe = pd.read_csv(f"s3://{bucket_name}/raw/{table_name}/{filename}")
 
         evolved_df, evol_exc = self.perform_schema_evolution(dataframe, table_name)
         if not evol_exc:
             stg_rows_count, stg_exc = self.load_to_postgres(table_name, evolved_df)
+            if stg_exc:
+                raise Exception(stg_exc)
+            logger.info(f"Rows loaded to STG: {stg_rows_count}")
         else:
             raise Exception(evol_exc)
 
